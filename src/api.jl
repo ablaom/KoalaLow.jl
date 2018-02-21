@@ -12,20 +12,24 @@
 # the present file useful as a template.
 
 # For each learning algorithm one defines a "model type", namely a
-# mutatable structure (a subtype `Koala.Model`) whose instantiations
-# are the "models" which store the *hyperparameters* of the
-# algorithm. An example of a hyperparameter is `min_patterns_split`;
-# this is a field of `TreeRegressor` in `KoalaTrees` which controls
-# the degree of pruning of decision trees. Parameters describing the
-# transformations to be applied to input or target data (eg, whether
-# to standardize target values) are also counted as hyperparameters.
+# mutatable structure (a subtype `Koala.Model`) whose instances are
+# the "models" storing the hyperparameters of the algorithm. An
+# example of a hyperparameter is `min_patterns_split`; this is a field
+# of `TreeRegressor` in `KoalaTrees` which controls the degree of
+# pruning of decision trees. Generally, parameters whose values effect the
+# outcome of model training are hyperparameters. So, the number of
+# trees in a random forest model is another parameter, but a flag
+# saying whether the trees should be trained in parallel is
+# not. Parameters describing the transformations to be applied to
+# input or target data (eg, whether to standardize target values) are
+# deemed to be hyperparameters.
 
 # Fitting a model to training data (see below) produces a "predictor"
-# which is not part of the model. However, the *type* of the predictor
-# must be declared implicitly when defining the model type, by an
-# appropriately subtyping as shown below. For example, the predictor
-# type for the `ConstantRegressor` model type (for simply predicting
-# the target mean for any input pattern) is `Float64`.
+# which is not part of the "model" in our sense. However, the *type*
+# of the predictor must be declared implicitly when defining the model
+# type, by an appropriately subtyping as shown below. For example, the
+# predictor type for the `ConstantRegressor` model type (for simply
+# predicting the target mean for any input pattern) is `Float64`.
 
 ################################
 # Module template starts below #
@@ -60,9 +64,6 @@ mutable struct SomeSupervisedModelType <: Classifier{CorrespondingPredictorType}
     ...and so on...
 end
 
-# for brevity in this template (do a query/replace instead):
-const SomeSupervisedModelType = SomeSupervisedModelType
-
 # lazy keywork constructor
 SomeSupervisedModelType(; param1=default1, parmam2=defalut2, etc) =
     SomeSupervisedModelType(param1, param2, etc)
@@ -71,23 +72,23 @@ SomeSupervisedModelType(; param1=default1, parmam2=defalut2, etc) =
 # needed to transform the training or testing input data into the form
 # required for the `fit` algorithm. For example, in a neural network,
 # this might include standardization of the inputs. The transformation
-# should furthermore only retain features with labels in
-# `features`.
+# should furthermore only retain features with labels in the input
+# vector `features`.
 #
 # To avoid data leakage, the transformation should depend only on
 # training data, which this routine takes to be the data in
 # `X[train_rows, features]`.
 #
-# Finally, one should include in `scheme_X` any "metadata" which
-# `fit` may require for reporting purposes, such as the feature
-# labels, `features`.
+# Finally, one should include in `scheme_X` any "metadata" which `fit`
+# may require for reporting purposes, such as the actual feature labels
+# (after, say, one-hot encoding the categoricals).
 get_scheme_X(model::SomeSupervisedModelType, X::AbstractDataFrame,
              train_rows, features) -> scheme_X
 
 # The actual transformation of inputs is carried out by following
 # `transform` method, which should first check `X` is compatible with
 # `scheme_X`; in particular, the feature labels of `X` should include
-# all those encoded in scheme_X:
+# all those passed to `get_scheme_X` above:
 transform(model::SomeSupervisedModelType, scheme_X, X::AbstractDataFrame) -> Xt 
 
 # Similar comments apply to transformations of the target, except that
