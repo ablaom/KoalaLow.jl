@@ -13,10 +13,12 @@
 
 # For each learning algorithm one defines a "model type", namely a
 # mutatable structure (a subtype `Koala.Model`) whose instantiations
-# are the "models" which store the hyperparameters of the
+# are the "models" which store the *hyperparameters* of the
 # algorithm. An example of a hyperparameter is `min_patterns_split`;
 # this is a field of `TreeRegressor` in `KoalaTrees` which controls
-# the degree of pruning of decision trees.
+# the degree of pruning of decision trees. Parameters describing the
+# transformations to be applied to input or target data (eg, whether
+# to standardize target values) are also counted as hyperparameters.
 
 # Fitting a model to training data (see below) produces a "predictor"
 # which is not part of the model. However, the *type* of the predictor
@@ -45,25 +47,25 @@ import Koala: get_scheme_X, get_scheme_y, transform, inverse_transform
 
 ## Model type definitions:
 
+# The following should include inner constructors if invariants need to be enforced:
 mutable struct SomeSupervisedModelType <: Regressor{CorrespondingPredictorType}
-
-   ...hyperparameters declared here with invariants enforced with an inner constructor...
-
+    hyperparam1::Float64
+    hyperparam2::Bool
+    ...and so on...
 end
-
 # or
-
 mutable struct SomeSupervisedModelType <: Classifier{CorrespondingPredictorType}
-
-    ...hyperparameters declared here with invariants enforced with an inner constructor...
-
+    hyperparam1::Float64
+    hyperparam2::Bool
+    ...and so on...
 end
 
 # for brevity in this template (do a query/replace instead):
-const M = SomeSupervisedModelType
+const SomeSupervisedModelType = SomeSupervisedModelType
 
 # lazy keywork constructor
-M(; param1=default1, parmam2=defalut2, etc) = M(param1, param2, etc)
+SomeSupervisedModelType(; param1=default1, parmam2=defalut2, etc) =
+    SomeSupervisedModelType(param1, param2, etc)
 
 # The output `scheme_X` of the following should include everything
 # needed to transform the training or testing input data into the form
@@ -79,19 +81,21 @@ M(; param1=default1, parmam2=defalut2, etc) = M(param1, param2, etc)
 # Finally, one should include in `scheme_X` any "metadata" which
 # `fit` may require for reporting purposes, such as the feature
 # labels, `features`.
-get_scheme_X(model::M, X::AbstractDataFrame, train_rows, features) -> scheme_X
+get_scheme_X(model::SomeSupervisedModelType, X::AbstractDataFrame,
+             train_rows, features) -> scheme_X
 
 # The actual transformation of inputs is carried out by following
 # `transform` method, which should first check `X` is compatible with
 # `scheme_X`; in particular, the feature labels of `X` should include
 # all those encoded in scheme_X:
-transform(model::M, scheme_X, X::AbstractDataFrame) -> Xt 
+transform(model::SomeSupervisedModelType, scheme_X, X::AbstractDataFrame) -> Xt 
 
 # Similar comments apply to transformations of the target, except that
 # an `inverse_transform` method must also be provided:
-get_scheme_y(model::M, y, train_rows) -> scheme_y
-transform(model::M, scheme_y, y::AbstractVector{T} where T<:Real) -> yt
-inverse_transform(model::M, scheme_y, yt) -> y
+get_scheme_y(model::SomeSupervisedModelType, y, train_rows) -> scheme_y
+transform(model::SomeSupervisedModelType, scheme_y,
+          y::AbstractVector{T}) where T<:Real) -> yt
+inverse_transform(model::SomeSupervisedModelType, scheme_y, yt) -> y
 
 # Any preliminary part of training that does not depend on the value
 # of `model` (ie it's field values) can be placed in `setup`. In
@@ -100,7 +104,7 @@ inverse_transform(model::M, scheme_y, yt) -> y
 # other training should go in `fit`. All results of `setup` needed for
 # the rest of training must be returned as `cache` for passing to
 # `fit`.
-setup(model::M, Xt, yt, scheme_X, parallel, verbosity) -> cache
+setup(model::SomeSupervisedModelType, Xt, yt, scheme_X, parallel, verbosity) -> cache
 
 # The value of `predictor` returned below need only include the
 # minimum data needed to furnish predictions on new patterns. In
@@ -119,11 +123,14 @@ setup(model::M, Xt, yt, scheme_X, parallel, verbosity) -> cache
 # implement special training instructions) and if `fit!` is called
 # with these arguments on a corresponding `SupervisedMachine` object,
 # then these will be passed along to `fit`.
-fit(model::M, cache, add, parallel, verbosity; args...) -> predictor, report, cache
-
+function fit(model::SomeSupervisedModelType,
+    cache, add, parallel, verbosity; args...)
+    return predictor, report, cache
+end
+    
 # The following uses `predictor` to predict *transformed* target
 # values on new *transformed* input patterns. 
-predict(model::M, predictor::P, Xt, parallel, verbosity) -> transformed_predictions
+predict(model::SomeSupervisedModelType, predictor::P, Xt, parallel, verbosity) -> transformed_predictions
 
 
 ## Provided automatically by `Koala` (this is FYI and should be deleted):
