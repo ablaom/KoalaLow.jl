@@ -12,13 +12,13 @@
 # the present file useful as a template.
 
 # For each learning algorithm one defines a "model type", namely a
-# mutatable structure (a subtype `Koala.Model`) whose instances are
+# mutatable structure (a subtype of `Koala.Model`) whose instances are
 # the "models" storing the hyperparameters of the algorithm. An
 # example of a hyperparameter is `min_patterns_split`; this is a field
 # of `TreeRegressor` in `KoalaTrees` which controls the degree of
 # pruning of decision trees. Generally, parameters whose values effect the
 # outcome of model training are hyperparameters. So, the number of
-# trees in a random forest model is another parameter, but a flag
+# trees in a random forest model is another hyperparameter, but a flag
 # saying whether the trees should be trained in parallel is
 # not. Parameters describing the transformations to be applied to
 # input or target data (eg, whether to standardize target values) are
@@ -38,7 +38,7 @@
 module SomeAlgorithm
 
 # new:
-export SomeSupervisedModelType
+export SomeSupervisedModelType # eg, RidgeRegressor
 
 # needed in this module:
 import Koala: Regressor
@@ -49,10 +49,11 @@ import Koala: setup, fit, predict
 import Koala: get_scheme_X, get_scheme_y, transform, inverse_transform
 
 
-## Model type definitions:
+## Model type definitions
 
 # The following should include inner constructors if invariants need to be enforced:
 mutable struct SomeSupervisedModelType <: Regressor{CorrespondingPredictorType}
+    # eg ConstantRegressor <: Regressor{Float64}
     hyperparam1::Float64
     hyperparam2::Bool
     ...and so on...
