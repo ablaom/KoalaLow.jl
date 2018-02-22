@@ -8,8 +8,8 @@ functions:
 - `setup`
 - `fit`
 - `predict`
-- `get_scheme_X`
-- `get_scheme_y`
+- `get_transformer_X`
+- `get_transformer_y`
 - `transform`
 - `inverse_transform`
 
@@ -21,4 +21,8 @@ other methods explicitly into scope do this:
     julia> using KoalaLow
 ````
 
-For more on the low-level interface, see the template at [/src/api.jl](/src/api.jl).
+For more on the low-level interface, see the template for implementing
+(or wrapping) new supervised learning algorithms at
+[SupervisedModelTemplate.jl](src/SupervisedModelTemplate.jl), and the
+template for new transformers at
+[TransformerTemplate.jl](src/TransformerTemplate.jl).
