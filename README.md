@@ -5,16 +5,17 @@
 Koala's low-level API consists of methods for the following
 functions: 
 
+- `default_transformer_X`
+- `default_transformer_y`
 - `setup`
 - `fit`
 - `predict`
-- `get_transformer_X`
-- `get_transformer_y`
 - `transform`
 - `inverse_transform`
 
-Of these, only `predict` is brought into scope by running `using
-Koala` (because `SupervisedMachine` objects need it). To bring the
+Of these, only `default_transformer_X`, `default_transformer_y` and
+`predict` are brought into scope by running `using Koala` (the last, because
+it is overloaded for use on `SupervisedMachine` objects). To bring the
 other methods explicitly into scope do this:
 
 ````julia

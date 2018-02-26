@@ -2,7 +2,7 @@
 # new Koala transformer type. See https://github.com/ablaom/KoalaTransforms.jl
 # for examples.
 
-struct SomeTransformerType <: Transformer
+mutable struct SomeTransformerType <: Transformer
     param1::Float64
     param2::Int
     etc...
