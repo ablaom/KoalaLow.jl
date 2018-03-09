@@ -66,7 +66,8 @@ import DataFrames: AbstractDataFrame # the form of all untransformed input data
 
 # to be extended (but not explicitly rexported):
 import Koala: setup, fit, predict
-import Koala: default_transformer_X, default_transformer_y, transform, inverse_transform
+import Koala: default_transformer_X, default_transformer_y, clean!
+import Koala: transform, inverse_transform
 
 
 ## MODEL TYPE DEFINITIONS
