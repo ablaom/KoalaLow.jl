@@ -1,6 +1,6 @@
 # A module template for Koala supervised models
 
-## Introduction
+## INTRODUCTION
 
 # This file breifly describes the low-level methods that must be
 # implemented for each new Koala supervised learning algorithm. If
@@ -40,8 +40,19 @@
 # type for the `ConstantRegressor` model type (for simply predicting
 # the target mean for any input pattern) is `Float64`.
 
+# Some general guidelines:
+
+# 1. Avoid giving models inner constructors, keeping in mind that
+# these are *mutable* types. (Any desired invariants can and should be
+# be enforced in the `clean!` method.)
+
+# 2. With the exception of the `fit` method for transformers (see
+# `TransformerTemplate.jl.`) avoid type and dimension checking in
+# low-level methods. They should not be needed.
+
+
 ################################
-# Module template starts below #
+# MODULE TEMPLATE STARTS BELOW #
 ################################
 
 module KoalaSomeAlgorithm # eg KoalaRidge
@@ -50,15 +61,16 @@ module KoalaSomeAlgorithm # eg KoalaRidge
 export SomeSupervisedModelType # eg, RidgeRegressor
 
 # needed in this module:
-import Koala: Regressor, Classifier
+import Koala: Regressor, Classifier, softwarn
 import DataFrames: AbstractDataFrame # the form of all untransformed input data
 
 # to be extended (but not explicitly rexported):
 import Koala: setup, fit, predict
-import Koala: default_transformer_X, default_transformer_y, transform, inverse_transform
+import Koala: default_transformer_X, default_transformer_y, clean!
+import Koala: transform, inverse_transform
 
 
-## Model type definitions
+## MODEL TYPE DEFINITIONS
 
 # The following should include inner constructors if invariants need to be enforced:
 mutable struct SomeSupervisedModelType <: Regressor{CorrespondingPredictorType}
@@ -75,11 +87,22 @@ mutable struct SomeSupervisedModelType <: Classifier{CorrespondingPredictorType}
 end
 
 # lazy keywork constructor:
-SomeSupervisedModelType(; param1=default1, parmam2=defalut2, etc) =
-    SomeSupervisedModelType(param1, param2, etc)
+function SomeSupervisedModelType(; param1=default1, parmam2=defalut2, etc)
+    model = SomeSupervisedModelType(param1, param2, etc)
+    softwarn(clean!(model))
+    return model
+end
+
+# The following optional method may change the fields of `model` to
+# attempt to enforce natural invariants and avoid errors in later
+# calls to `fit`. Any changes should be reported to the returned
+# string (empty if the model parameters are fine). As a last resort, it
+# may throw an exception. The high-level `fit!` method always calls
+# this before doing anything else.
+function clean!(model::SomeSupervisedModelType) -> message
 
 
-## Transformers
+## TRANSFORMERS
 
 # For each model default `Transformer` objects must be specified with
 # the following methods. The transformers are used to transform the
@@ -93,7 +116,7 @@ default_transformer_y(model::SomeSupervisedModelType) -> transformer_y::Transfor
 
 # Notes:
 
-# - Of course if `transformer_X` or `transformer_y` are of new
+# 1. Of course if `transformer_X` and `transformer_y` are of new
 #   transformer types, then corresponding `fit` and `transform`
 #   methods will need to be provided. An `inverse_transform` method is
 #   required only in the case of `transformer_y`. At the very least,
@@ -101,29 +124,31 @@ default_transformer_y(model::SomeSupervisedModelType) -> transformer_y::Transfor
 #   the features of the dataframe `X` given as input, so that only
 #   these are retained in calls to `transform` on test data.
 
-# - Any other "metadata"  needed for reporting, in calls to the supervised
-#   model's `fit` method defined below, should also be stored in the
-#   scheme, `scheme_X`, output by `fit(transformer_X, etc...)`.  The
-#   metadata should be extracted from `scheme_X` in `setup` below and
-#   bundled in the `cache` part of that method's return value. In this
-#   way `fit` will have access to the metadata through its `cache`
-#   input.
+# 2. Any other "metadata" needed for reporting, in calls to the
+#   supervised model's `fit` method defined below, should also be
+#   stored in the scheme, `scheme_X`, output by `fit(transformer_X,
+#   etc...)`.  The metadata should be extracted from `scheme_X` in
+#   `setup` below and bundled in the `cache` part of that method's
+#   return value. In this way `fit` will have access to the metadata
+#   through its `cache` input.
 
-# - To avoid data leakage, it is understood that transformers are only
-#   fit on training data.
+# 3. To avoid data leakage, it is understood that transformers are
+#   only fit on training data.
 
 
-## Training and prediction methods
+## TRAINING AND PREDICTION METHODS
 
-# Any preliminary part of training, possibly depending on the training
-# data, but that does not depend on the value of `model` (ie it's
-# field values) can be placed in `setup`. (It is assumed that the data
-# received by `setup` is already transformed.)  In iterative training
-# algorithms, any such calculation which need not be repeated when
+# Any preliminary part of training that does *not* depend on the value
+# of `model` (ie it's field values) can be placed in `setup`. (It is
+# assumed that the data received by `setup` is already transformed.)
+# Note that every time new data is given to the high-level method
+# `fit!`, `setup` will be called anew.  In iterative training
+# algorithms, any such calculation which needn't be repeated when
 # iterations are added should go in `setup`. All other training should
 # go in `fit`. All results of `setup` needed for the rest of training
 # must be returned as `cache` for passing to `fit`.
-setup(model::SomeSupervisedModelType, Xt, yt, scheme_X, parallel, verbosity) -> cache
+setup(model::SomeSupervisedModelType, Xt, yt,
+      scheme_X, parallel, verbosity) -> cache
 
 # The value of `predictor` returned below need only include the
 # minimum data needed to furnish predictions on new patterns. In

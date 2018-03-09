@@ -7,13 +7,21 @@ functions:
 
 - `default_transformer_X`
 - `default_transformer_y`
+<<<<<<< HEAD
+=======
+- `clean!`
+>>>>>>> 86f78d5b79d73ffbc580f35e0ea6429895fc4900
 - `setup`
 - `fit`
 - `predict`
 - `transform`
 - `inverse_transform`
 
+<<<<<<< HEAD
 Of these, only `default_transformer_X`, `default_transformer_y` and
+=======
+Of these, only `default_transformer_X`, `default_transformer_y`, `clean!` and
+>>>>>>> 86f78d5b79d73ffbc580f35e0ea6429895fc4900
 `predict` are brought into scope by running `using Koala` (the last, because
 it is overloaded for use on `SupervisedMachine` objects). To bring the
 other methods explicitly into scope do this:
