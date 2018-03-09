@@ -93,6 +93,14 @@ function SomeSupervisedModelType(; param1=default1, parmam2=defalut2, etc)
     return model
 end
 
+# The following optional method may change the fields of `model` to
+# attempt to enforce natural invariants and avoid errors in later
+# calls to `fit`. Any changes should be reported to the returned
+# string (empty if the model parameters are fine). As a last resort, it
+# may throw an exception. The high-level `fit!` method always calls
+# this before doing anything else.
+function clean!(model::SomeSupervisedModelType) -> message
+
 
 ## TRANSFORMERS
 
@@ -126,17 +134,6 @@ default_transformer_y(model::SomeSupervisedModelType) -> transformer_y::Transfor
 
 # 3. To avoid data leakage, it is understood that transformers are
 #   only fit on training data.
-
-
-## ENFORCING MODEL PARAMETER INVARIANTS
-
-# The following optional method may change the fields of `model` to
-# attempt to enforce natural invariants and avoid errors in later
-# calls to `fit`. Any changes should be reported to the returned
-# string (empty if the model parameters are fine). As last resort it
-# may throw an exception. The high-level `fit!` method always calls
-# this before doing anything else.
-function clean!(model::SomeSupervisedModelType) -> message
 
 
 ## TRAINING AND PREDICTION METHODS
