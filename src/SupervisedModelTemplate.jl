@@ -93,7 +93,7 @@ default_transformer_y(model::SomeSupervisedModelType) -> transformer_y::Transfor
 
 # Notes:
 
-# - Of course if `transformer_X` and `transformer_y` are of new
+# - Of course if `transformer_X` or `transformer_y` are of new
 #   transformer types, then corresponding `fit` and `transform`
 #   methods will need to be provided. An `inverse_transform` method is
 #   required only in the case of `transformer_y`. At the very least,
@@ -115,14 +115,14 @@ default_transformer_y(model::SomeSupervisedModelType) -> transformer_y::Transfor
 
 ## Training and prediction methods
 
-# Any preliminary part of training that does not depend on the value
-# of `model` (ie it's field values) can be placed in `setup`. (It is
-# assumed that the data received by `setup` is already transformed.)
-# In iterative training algorithms, any such calculation which need
-# not be repeated when iterations are added should go in `setup`. All
-# other training should go in `fit`. All results of `setup` needed for
-# the rest of training must be returned as `cache` for passing to
-# `fit`.
+# Any preliminary part of training, possibly depending on the training
+# data, but that does not depend on the value of `model` (ie it's
+# field values) can be placed in `setup`. (It is assumed that the data
+# received by `setup` is already transformed.)  In iterative training
+# algorithms, any such calculation which need not be repeated when
+# iterations are added should go in `setup`. All other training should
+# go in `fit`. All results of `setup` needed for the rest of training
+# must be returned as `cache` for passing to `fit`.
 setup(model::SomeSupervisedModelType, Xt, yt, scheme_X, parallel, verbosity) -> cache
 
 # The value of `predictor` returned below need only include the
