@@ -61,7 +61,7 @@ module KoalaSomeAlgorithm # eg KoalaRidge
 export SomeSupervisedModelType # eg, RidgeRegressor
 
 # needed in this module:
-import Koala: Regressor, Classifier
+import Koala: Regressor, Classifier, softwarn
 import DataFrames: AbstractDataFrame # the form of all untransformed input data
 
 # to be extended (but not explicitly rexported):
@@ -89,7 +89,7 @@ end
 # lazy keywork constructor:
 function SomeSupervisedModelType(; param1=default1, parmam2=defalut2, etc)
     model = SomeSupervisedModelType(param1, param2, etc)
-    println(clean!(model))
+    softwarn(clean!(model))
     return model
 end
 
