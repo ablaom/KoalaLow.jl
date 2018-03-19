@@ -3,10 +3,10 @@
 > For exposing Koala's low-level interface.
 
 Koala's high-level interface operates primarily on
-*machines*. Presently, the Koala objects which can wrapped in machines
-are *supervised models* and *transformers*.  Koala's low-level
-interface amounts to definitions of the following methods, for each for
-each supervised model type `SMT <: Koala.SupervisedModel`, and
+*machines*. Presently, the Koala objects which can be wrapped in
+machines are *supervised models* and *transformers*.  Koala's
+low-level interface amounts to definitions of the following methods,
+for each supervised model type `SMT <: Koala.SupervisedModel`, and
 transformer type `TT <: Koala.Transformer`:
 
 - `default_transformer_X(model::SMT)`
@@ -32,7 +32,7 @@ The first two methods on the list have fall-backs defined in `Koala`.
 It is our intention that the low-level implementation of most
 transformers appear in `KoalaTransforms` (a few are in `Koala`
 itself), while each supervised model (or family of similar such
-models) gets their own dedicated module.
+models) gets their own dedicated module (e.g., `KoalaTrees`).
 
 The code,
 
@@ -41,7 +41,7 @@ using Koala
 ````
 
 brings `default_transformer_X`, `default_transformer_y`, `clean!` and
-`predict` into scope. To bring any other low-level method into scope, one imports it explicitly from `Koala`; to bring all of them into scope use
+`predict` into scope. To bring any other low-level method into scope, one imports it explicitly from `Koala`; to bring all of them into scope, use
 
 ````
 using KoalaLow
