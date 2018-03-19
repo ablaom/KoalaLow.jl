@@ -13,7 +13,7 @@ transformer type `TT <: Koala.Transformer`:
 
 - `default_transformer_y(model::SMT)`
 
-- `clean!(model::SMT)`
+- `clean!(model::SMT)` (optional)
 
 - `setup(model::SMT, Xt, yt, scheme_X, parallel, verbosity)`
 
@@ -27,12 +27,15 @@ transformer type `TT <: Koala.Transformer`:
 
 - `inverse_transform(transformer::TT, scheme, Xt)` (optional)
 
-The first two methods on the list have fall-backs defined in `Koala`. 
+The first two methods on the list have fall-backs defined in `Koala`,
+but each of the others require explicit implementations, unless marked
+"optional".
 
 It is our intention that the low-level implementation of most
-transformers appear in `KoalaTransforms` (a few are in `Koala`
-itself), while each supervised model (or family of similar such
-models) gets their own dedicated module (e.g., `KoalaTrees`).
+transformers appear in `KoalaTransforms` (a few are in `Koala` itself
+but re-exported by `KoalaTransforms`) while each supervised model (or
+family of similar such models) gets their own dedicated module (e.g.,
+`KoalaTrees`).
 
 The code,
 
@@ -41,7 +44,10 @@ using Koala
 ````
 
 brings `default_transformer_X`, `default_transformer_y`, `clean!` and
-`predict` into scope. To bring any other low-level method into scope, one imports it explicitly from `Koala`; to bring all of them into scope, use
+`predict` into scope (the last because it is overloaded in the
+high-level interface). To bring any other low-level method into scope,
+one imports it explicitly from `Koala`; to bring all of them into
+scope, use
 
 ````
 using KoalaLow
