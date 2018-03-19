@@ -2,7 +2,7 @@
 
 ## INTRODUCTION
 
-# This file breifly describes the low-level methods that must be
+# This file briefly describes the low-level methods that must be
 # implemented for each new Koala supervised learning algorithm. If
 # this algorithm is called "SomeAlgorithm", then this implementation
 # is conventionally contained in a module called `KoalaSomeAlgorithm`,
@@ -18,13 +18,13 @@
 # store parameters controlling the outcome of training. A parameter
 # controlling *how*, rather than *what*, the algorithm does is not a
 # model parameter for present purposes. When a model parameter is
-# changed during training, a machine wrapped around the model (see
-# Koala.jl) does not need to be reconstructed. Parameters describing
-# the transformations to be applied to input or target data (eg,
-# whether to standardize target values) are *not* viwed as model
-# parameters (as changing them generally necessitates wrapping a model
-# in a new machine).
-
+# changed during training, a machine wrapped around the model (which
+# includes transformed versions of the learning data - see Koala.jl)
+# does not need to be reconstructed. Parameters describing the
+# transformations to be applied to input or target data (eg, whether
+# to standardize target values) are *not* viewed as model parameters,
+# as changing them generally necessitates wrapping the model in a new
+# machine.
 
 # An example of a model parameter is `min_patterns_split`; this is a
 # field of `TreeRegressor` in `KoalaTrees` which controls the degree
@@ -72,7 +72,6 @@ import Koala: transform, inverse_transform
 
 ## MODEL TYPE DEFINITIONS
 
-# The following should include inner constructors if invariants need to be enforced:
 mutable struct SomeSupervisedModelType <: Regressor{CorrespondingPredictorType}
     # eg ConstantRegressor <: Regressor{Float64}
     param1::Float64
@@ -89,7 +88,7 @@ end
 # lazy keywork constructor:
 function SomeSupervisedModelType(; param1=default1, parmam2=defalut2, etc)
     model = SomeSupervisedModelType(param1, param2, etc)
-    softwarn(clean!(model))
+    softwarn(clean!(model)) # only issues warning if `clean!` changes `model`
     return model
 end
 
@@ -98,7 +97,7 @@ end
 # calls to `fit`. Any changes should be reported to the returned
 # string (empty if the model parameters are fine). As a last resort, it
 # may throw an exception. The high-level `fit!` method always calls
-# this before doing anything else.
+# this method on the model before doing anything else.
 function clean!(model::SomeSupervisedModelType) -> message
 
 
@@ -118,11 +117,12 @@ default_transformer_y(model::SomeSupervisedModelType) -> transformer_y::Transfor
 
 # 1. Of course if `transformer_X` and `transformer_y` are of new
 #   transformer types, then corresponding `fit` and `transform`
-#   methods will need to be provided. An `inverse_transform` method is
-#   required only in the case of `transformer_y`. At the very least,
-#   the scheme that `transform` outputs should record the labels of
-#   the features of the dataframe `X` given as input, so that only
-#   these are retained in calls to `transform` on test data.
+#   methods will need to be provided (see TransformerTemplate.jl). An
+#   `inverse_transform` method is required only in the case of
+#   `transformer_y`. At the very least, the scheme that `transform`
+#   outputs should record the labels of the features of the dataframe
+#   `X` given as input, so that only these are retained in calls to
+#   `transform` on test data.
 
 # 2. Any other "metadata" needed for reporting, in calls to the
 #   supervised model's `fit` method defined below, should also be
@@ -160,13 +160,14 @@ setup(model::SomeSupervisedModelType, Xt, yt,
 # Calling `fit` with `add=true` for an iterative training algorithm
 # should add iterations.
 #
-# Care should be taken that successive calls to `fit` with
-# `add=false` return *distinct* `predictor` objects. Although we use
-# "fit" and not "fit!" here, we allow `fit` to change the value of
-# `cache`. You may design `fit` to take keyword arguments, `args` (to
-# implement special training instructions) and if `fit!` is called
+# Care should be taken that successive calls to `fit` with `add=false`
+# return *distinct* `predictor` objects. We allow `fit` to change the
+# value of `cache` (but do not use the name "fit!" to distiguish the
+# method from the high-level method with that name). You may design
+# `fit` to take keyword arguments, `args` (to implement special
+# training instructions) and if the high-level method `fit!` is called
 # with these arguments on a corresponding `SupervisedMachine` object,
-# then these will be passed along to `fit`.
+# then these will be passed along to the low-level `fit` method below.
 function fit(model::SomeSupervisedModelType, cache, add, parallel, verbosity; args...)
     return predictor, report, cache
 end
