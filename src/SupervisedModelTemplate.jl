@@ -141,8 +141,8 @@ default_transformer_y(model::SomeSupervisedModelType) -> transformer_y::Transfor
 # Any preliminary part of training that does *not* depend on the value
 # of `model` (ie it's field values) can be placed in `setup`. (It is
 # assumed that the data received by `setup` is already transformed.)
-# Note that every time new data is given to the high-level method
-# `fit!`, `setup` will be called anew.  In iterative training
+# Note that every time new training rows are given to the high-level
+# method `fit!`, `setup` will be called anew.  In iterative training
 # algorithms, any such calculation which needn't be repeated when
 # iterations are added should go in `setup`. All other training should
 # go in `fit`. All results of `setup` needed for the rest of training

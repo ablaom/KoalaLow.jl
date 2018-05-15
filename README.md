@@ -46,7 +46,7 @@ using Koala
 brings `default_transformer_X`, `default_transformer_y`, `clean!` and
 `predict` into scope (the last because it is overloaded in the
 high-level interface). To bring any other low-level method into scope,
-one imports it explicitly from `Koala`; to bring all of them into
+one can import it explicitly from `Koala`; to bring all of them into
 scope, use
 
 ````
