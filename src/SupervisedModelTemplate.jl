@@ -122,7 +122,7 @@ default_transformer_y(model::SomeSupervisedModelType) -> transformer_y::Transfor
 #   `transformer_y`. At the very least, the scheme that `transform`
 #   outputs should record the labels of the features of the dataframe
 #   `X` given as input, so that only these are retained in calls to
-#   `transform` on test data.
+#   `transform` on new data.
 
 # 2. Any other "metadata" needed for reporting, in calls to the
 #   supervised model's `fit` method defined below, should also be
