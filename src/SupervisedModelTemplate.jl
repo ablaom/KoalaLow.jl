@@ -119,10 +119,10 @@ default_transformer_y(model::SomeSupervisedModelType) -> transformer_y::Transfor
 #   transformer types, then corresponding `fit` and `transform`
 #   methods will need to be provided (see TransformerTemplate.jl). An
 #   `inverse_transform` method is required only in the case of
-#   `transformer_y`. At the very least, the scheme that `transform`
-#   outputs should record the labels of the features of the dataframe
-#   `X` given as input, so that only these are retained in calls to
-#   `transform` on new data.
+#   `transformer_y`. At the very least, the scheme that encodes input
+#   transformations should record the labels of the features of the
+#   dataframe `X` given as input, so that only these are retained in
+#   calls to `transform` on new data.
 
 # 2. Any other "metadata" needed for reporting, in calls to the
 #   supervised model's `fit` method defined below, should also be
@@ -139,14 +139,17 @@ default_transformer_y(model::SomeSupervisedModelType) -> transformer_y::Transfor
 ## TRAINING AND PREDICTION METHODS
 
 # Any preliminary part of training that does *not* depend on the value
-# of `model` (ie it's field values) can be placed in `setup`. (It is
-# assumed that the data received by `setup` is already transformed.)
-# Note that every time new training rows are given to the high-level
-# method `fit!`, `setup` will be called anew.  In iterative training
-# algorithms, any such calculation which needn't be repeated when
-# iterations are added should go in `setup`. All other training should
-# go in `fit`. All results of `setup` needed for the rest of training
-# must be returned as `cache` for passing to `fit`.
+# of `model` (ie it's field values) can be placed in
+# `setup`. Typically, `setup` places in to its `cache` return value
+# the training input and target data needed for `fit`, together with
+# some metadata. (It is assumed that the data received by `setup` is
+# already transformed.)  Note that every time new training rows are
+# given to the high-level method `fit!`, `setup` will be called anew.
+# In iterative training algorithms, any such calculation which needn't
+# be repeated when iterations are added should go in `setup`. All
+# other training should go in `fit`. All results of `setup` needed for
+# the rest of training must be returned as `cache` for passing to
+# `fit`.
 setup(model::SomeSupervisedModelType, Xt, yt,
       scheme_X, parallel, verbosity) -> cache
 
