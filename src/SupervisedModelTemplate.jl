@@ -163,14 +163,19 @@ setup(model::SomeSupervisedModelType, Xt, yt,
 # Calling `fit` with `add=true` for an iterative training algorithm
 # should add iterations.
 #
-# Care should be taken that successive calls to `fit` with `add=false`
-# return *distinct* `predictor` objects. We allow `fit` to change the
-# value of `cache` (but do not use the name "fit!" to distiguish the
-# method from the high-level method with that name). You may design
-# `fit` to take keyword arguments, `args` (to implement special
-# training instructions) and if the high-level method `fit!` is called
-# with these arguments on a corresponding `SupervisedMachine` object,
-# then these will be passed along to the low-level `fit` method below.
+# IMPORTANT: Care should be taken that successive calls to `fit` with
+# `add=false` return *distinct* `predictor` objects, in the sense that
+# any change to one has no effect on the other. If this is not
+# possible, then uncomment the following line:
+# Koala.supports_ensembling(model::SomeSupervisedModelType) = false    
+
+# We allow `fit` to change the value of `cache` (but do not use the
+# name "fit!" to distiguish the method from the high-level method with
+# that name). You may design `fit` to take keyword arguments, `args`
+# (to implement special training instructions) and if the high-level
+# method `fit!` is called with these arguments on a corresponding
+# `SupervisedMachine` object, then these will be passed along to the
+# low-level `fit` method below.
 function fit(model::SomeSupervisedModelType, cache, add, parallel, verbosity; args...)
     return predictor, report, cache
 end

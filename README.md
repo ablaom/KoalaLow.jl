@@ -1,6 +1,8 @@
 # KoalaLow
 
-> For exposing Koala's low-level interface.
+For exposing the low-level interface of the
+[Koala](https://github.com/ablaom/Koala.jl) machine learning
+environment.
 
 Koala's high-level interface operates primarily on
 *machines*. Presently, the Koala objects which can be wrapped in
@@ -33,7 +35,7 @@ but each of the others require explicit implementations, unless marked
 
 It is our intention that the low-level implementation of most
 transformers appear in `KoalaTransforms` (a few are in `Koala` itself
-but re-exported by `KoalaTransforms`) while each supervised model (or
+but are re-exported by `KoalaTransforms`) while each supervised model (or
 family of similar such models) gets their own dedicated module (e.g.,
 `KoalaTrees`).
 
